@@ -7,11 +7,20 @@ from playsound import playsound
 from tkinter import *
 from ctypes import *
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 class Rotator:
     def __init__(self):
         self.oldbg = self.getCurrentBackground()
-        self.woo = os.getcwd()+"\sounds\woo.mp3"
-        self.newbg = os.getcwd()+"\\images\\rotated.jpg"
+        self.woo = resource_path("woo.mp3")
+        self.newbg = resource_path("rotated.jpg")
         self.monitors = self.getMonitors()
         
 
@@ -51,6 +60,9 @@ class Rotator:
         if dll.SystemParametersInfoW(SPI_GETDESKWALLPAPER,200,ubuf,0):
             return ubuf.value
 
+    def resetWallPaper(self):
+        ok = windll.user32.SystemParametersInfoW(win32con.SPI_SETDESKWALLPAPER, 0, self.oldbg, 0)
+
     def setWallpaperWithCtypes(self,path):
         ustr = create_string_buffer(path.encode('utf-8'))
         ok = windll.user32.SystemParametersInfoA(win32con.SPI_SETDESKWALLPAPER, 0, ustr, 0)
@@ -84,8 +96,6 @@ class UI:
 
     def setup(self):
         self.window.title("StarFinder Character Creator")
-        #width = self.window.winfo_screenwidth() 
-        #height = self.window.winfo_screenheight()
         self.window.geometry("%dx%d" % (350, 200))
         self.butt.configure(command=self.do)
         self.butt.pack()
